@@ -120,6 +120,11 @@ if __name__ == "__main__":
         mcp.run(transport="stdio")
     else:
         port = int(os.environ.get("PORT", "8000"))
+        host = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "mcp-research-tools.onrender.com")
         mcp.settings.port = port
         mcp.settings.host = "0.0.0.0"
+        # Render terminates TLS/proxies requests with the public onrender.com host.
+        mcp.settings.transport_security.enable_dns_rebinding_protection = True
+        mcp.settings.transport_security.allowed_hosts = [host, f"{host}:*", "127.0.0.1:*", "localhost:*", "[::1]:*"]
+        mcp.settings.transport_security.allowed_origins = [f"https://{host}", f"https://{host}:*", "http://127.0.0.1:*", "http://localhost:*", "http://[::1]:*"]
         mcp.run(transport="sse")
